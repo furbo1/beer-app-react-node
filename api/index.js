@@ -1,10 +1,10 @@
 const express = require('express')
 const app = express()
-const config = require('./config/config')
+const config = require('./src/config/config')
 var cors = require('cors');
 var bodyParser = require('body-parser');
 
-var db = require('./config/db');
+var db = require('./src/config/db');
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -23,7 +23,7 @@ d.on("error", function (error) {
 });
 
 
-require('./config/routes')(app);
+require('./src/config/routes')(app);
 
 
 app.listen(config.port, ()=> {
