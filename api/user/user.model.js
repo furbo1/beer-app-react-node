@@ -14,5 +14,5 @@ module.exports = User;
 
 //MVC PATTERN
 // HTTP ARQUITECTURE
-// RESTful
-//
+// RESTful + React
+// mongoose 
