@@ -1,11 +1,12 @@
-var express = require('express');
-var router = express.Router();
-
 const userRouter = require('../user/user.router');
+const employeeRouter = require('../employee/employee.router');
+const beerRouter = require('../beer/beer.router')
 //import beerRouter
 
 module.exports = (app) => {
     app.use("/user", userRouter);
+    app.use("/employee", employeeRouter);
+    app.use("/beer", beerRouter);
 
     //add beerRoute
 

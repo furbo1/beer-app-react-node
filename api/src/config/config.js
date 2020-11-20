@@ -3,7 +3,7 @@ var config = {
     host: 'localhost',
     env: 'development',
     "secret": "49fb775afa045a8d97a4ddba26c725cb",
-    "timer": 1562271258
+    "timer": 123123123
 };
 
 module.exports = config;

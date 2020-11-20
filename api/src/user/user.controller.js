@@ -1,5 +1,8 @@
 
 var User = require('./user.model');
+let bcrypt = require('bcrypt');
+let config = require('../config/config');
+let jwt = require('jsonwebtoken');
 
 exports.getUsers = async (req, res) => {
     try{
@@ -57,10 +60,10 @@ exports.getUsersByName = async (req, res) => {
 
 exports.createUser = async (req, res) => {
     try {
-        let user = req.body;
+        let { username, email, password} = req.body;
 
-        const newUser = await User.create(user);
-
+        const newUser = await User.create({username, email, password});
+        newUser.password = undefined;
         if(newUser) {
             return res.status(201).send({ message: "User created!", data: newUser });
         } else {
@@ -74,10 +77,16 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req,res) =>{
     try{
-        let newUser = req.body; // from BODY
+        let {username, email, password} = req.body; // from BODY
         let userId = req.params.id // from URL
 
-        const userUpdated = await User.findByIdAndUpdate(mongoose.Types.ObjectId(userId), { $set: newUser }, { new: true });
+        let userFromReq = {
+            username,
+            email,
+            password
+        }
+
+        const userUpdated = await User.findByIdAndUpdate(mongoose.Types.ObjectId(userId), { $set: userFromReq}, { new: true });
 
         if (userUpdated) {
             return res.status(202).json({ message: "User Updated", data: userUpdated });
@@ -102,6 +111,30 @@ exports.deleteUser = async (req,res) =>{
             return res.status(400).json({message: "Error message!"})
         } 
     } catch(error){
+        return res.status(400).json(error.message)
+    }
+}
+
+function generateToken(params = {}) {
+    return jwt.sign({ params }, config.secret, {
+        expiresIn: config.timer
+    });
+};
+
+
+exports.login = async (req,res) =>{
+    try{
+        const { email, password } = req.body;
+        const user = await User.findOne({ email }).select('+password');
+        if(!user) {
+            return res.status(404).send({ message: "User not found!" });
+        }
+        if (!await bcrypt.compare(password, user.password)) {
+            return res.status(400).send({ message: 'Invalid password! Try again!' });
+        }
+        user.password = undefined;
+        return res.send({ message: "Welcome "+ user.username, data: user, token: generateToken({ id: user.id }) });
+    }catch(error) {
         return res.status(400).json(error.message)
     }
 }
